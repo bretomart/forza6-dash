@@ -1,12 +1,25 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useTelemetryStore } from './stores/telemetryStore'
 import ConceptSpeedometer from './components/ConceptSpeedometer.vue'
 import ConceptAnalytics from './components/ConceptAnalytics.vue'
 import ConceptChassis from './components/ConceptChassis.vue'
 import ConceptStatistics from './components/ConceptStatistics.vue'
-import { Wifi, WifiOff, Radio } from 'lucide-vue-next'
+import { Wifi, WifiOff, Radio, Power } from 'lucide-vue-next'
 
 const { status, isLiveStreamActive } = useTelemetryStore()
+
+const isShuttingDown = ref(false)
+
+const shutdownServer = async () => {
+  if (!confirm('Are you sure you want to stop the Forza Telemetry Dash & Relay?')) return
+  isShuttingDown.value = true
+  try {
+    await fetch('/api/shutdown', { method: 'POST' })
+  } catch {
+    // Ignored as server closes
+  }
+}
 </script>
 
 <template>
@@ -56,6 +69,17 @@ const { status, isLiveStreamActive } = useTelemetryStore()
             <component :is="status === 'OPEN' ? Wifi : WifiOff" class="w-4 h-4" />
             <span>{{ status === 'OPEN' ? 'WS BRIDGE: ONLINE' : 'WS BRIDGE: OFFLINE' }}</span>
           </div>
+
+          <!-- Quick Exit / Stop Daemon Button -->
+          <button
+            @click="shutdownServer"
+            :disabled="isShuttingDown"
+            class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-rose-900/60 bg-rose-950/40 hover:bg-rose-900/60 active:scale-95 text-rose-300 text-xs font-mono font-bold transition-all duration-150 cursor-pointer shadow-md"
+            title="Stop Relay & Exit Dashboard"
+          >
+            <Power class="w-3.5 h-3.5 text-rose-400" />
+            <span>{{ isShuttingDown ? 'STOPPING...' : 'EXIT' }}</span>
+          </button>
         </div>
       </header>
 

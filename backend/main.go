@@ -27,6 +27,9 @@ var embeddedDashboard embed.FS
 //go:embed icon.ico
 var iconIcoData []byte
 
+//go:embed icon64.png
+var icon64PngData []byte
+
 //go:embed icon.png
 var iconPngData []byte
 
@@ -443,6 +446,18 @@ func main() {
 		}()
 	})
 
+	// HTTP shutdown endpoint so users can stop the daemon directly from the web HUD
+	http.HandleFunc("/api/shutdown", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"status":"shutting_down"}`))
+		go func() {
+			time.Sleep(300 * time.Millisecond)
+			log.Printf("[SYSTEM] Graceful shutdown requested via web interface")
+			systray.Quit()
+			os.Exit(0)
+		}()
+	})
+
 	// Serve the embedded Vue 3 SPA frontend directly from root
 	webSubFS, err := fs.Sub(embeddedDashboard, "web")
 	if err == nil {
@@ -496,7 +511,8 @@ func main() {
 			if runtime.GOOS == "windows" {
 				systray.SetIcon(iconIcoData)
 			} else {
-				systray.SetIcon(iconPngData)
+				// Use 64x64 PNG for optimal KDE Plasma StatusNotifierItem rendering
+				systray.SetIcon(icon64PngData)
 			}
 			systray.SetTitle("Forza 6 Telemetry")
 			systray.SetTooltip("Forza 6 Telemetry Dash & UDP Relay")
