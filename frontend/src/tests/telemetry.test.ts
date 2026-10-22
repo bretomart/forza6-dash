@@ -138,4 +138,40 @@ describe('Forza Telemetry Core Mathematics & Computations', () => {
     expect(redline.norm).toBe(1.0)
     expect(redline.activeLength).toBeCloseTo(485.90, 1)
   })
+
+  it('dynamically accumulates session distance from speed and time interval', () => {
+    let accumulatedDistanceMeters = 0
+    let lastTime = 1000
+
+    const processPacket = (speedMs: number, currentTimeMs: number, packetDistance: number) => {
+      if (lastTime > 0 && speedMs > 0.1) {
+        const dt = (currentTimeMs - lastTime) / 1000
+        if (dt > 0 && dt < 0.5) {
+          accumulatedDistanceMeters += speedMs * dt
+        }
+      }
+      lastTime = currentTimeMs
+
+      if (packetDistance && packetDistance > accumulatedDistanceMeters) {
+        accumulatedDistanceMeters = packetDistance
+      }
+      return accumulatedDistanceMeters
+    }
+
+    // Driving at 50 m/s (~180 km/h) for 100ms
+    const d1 = processPacket(50.0, 1100, 0)
+    expect(d1).toBeCloseTo(5.0, 1)
+
+    // Driving another 100ms at 50 m/s
+    const d2 = processPacket(50.0, 1200, 0)
+    expect(d2).toBeCloseTo(10.0, 1)
+
+    // Official track measurement in an active race supersedes if higher
+    const d3 = processPacket(50.0, 1300, 250.0)
+    expect(d3).toBe(250.0)
+
+    // Reconnection lag guard: if dt >= 0.5s, don't create artificial jump
+    const d4 = processPacket(50.0, 3000, 0)
+    expect(d4).toBe(250.0)
+  })
 })

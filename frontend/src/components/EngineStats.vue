@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useTelemetryStore } from '../stores/telemetryStore'
 
-const { telemetry } = useTelemetryStore()
+const { telemetry, sessionDistanceMeters } = useTelemetryStore()
 
 // Power in kW (Metric primary) and converted to Horsepower
 const powerKw = computed(() => {
@@ -141,7 +141,7 @@ const fuelPercentage = computed(() => {
       </div>
       <div class="bg-black/50 p-2.5 rounded-lg border border-neutral-800/80 flex flex-col justify-between">
         <div class="text-[9px] text-neutral-500 uppercase font-bold">ODOMETER</div>
-        <div class="text-base font-black text-neutral-200">{{ ((telemetry.distanceTraveled || 0) / 1000).toFixed(2) }} <span class="text-[10px] text-neutral-400 font-normal">KM</span></div>
+        <div class="text-base font-black text-neutral-200">{{ ((sessionDistanceMeters || telemetry.distanceTraveled || 0) / 1000).toFixed(2) }} <span class="text-[10px] text-neutral-400 font-normal">KM</span></div>
       </div>
     </div>
   </div>

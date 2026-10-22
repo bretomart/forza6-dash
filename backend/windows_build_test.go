@@ -13,7 +13,7 @@ import (
 // TestWindowsPEStructure validates the PE32+ executable header, architecture,
 // subsystem, and OS compatibility for Windows 10/11 x64 systems.
 func TestWindowsPEStructure(t *testing.T) {
-	exePath := "../release/forza6-dash-v1.1.1-windows-x64.exe"
+	exePath := "../release/forza6-dash-v1.1.2-windows-x64.exe"
 	file, err := pe.Open(exePath)
 	if err != nil {
 		t.Fatalf("Failed to open Windows executable: %v", err)
@@ -88,7 +88,7 @@ func TestWindowsPEStructure(t *testing.T) {
 // TestWindowsEmbeddedResources inspects the embedded PE resource directory
 // ensuring valid multi-resolution desktop icons (RT_ICON and RT_GROUP_ICON) are present.
 func TestWindowsEmbeddedResources(t *testing.T) {
-	exePath := "../release/forza6-dash-v1.1.1-windows-x64.exe"
+	exePath := "../release/forza6-dash-v1.1.2-windows-x64.exe"
 	raw, err := os.ReadFile(exePath)
 	if err != nil {
 		t.Fatalf("Failed to read binary: %v", err)
@@ -147,7 +147,7 @@ func TestWindowsEmbeddedResources(t *testing.T) {
 // TestWindowsEmbeddedFrontendAssets verifies that the compiled Vue 3 HUD assets
 // are embedded in the Windows executable binary.
 func TestWindowsEmbeddedFrontendAssets(t *testing.T) {
-	exePath := "../release/forza6-dash-v1.1.1-windows-x64.exe"
+	exePath := "../release/forza6-dash-v1.1.2-windows-x64.exe"
 	raw, err := os.ReadFile(exePath)
 	if err != nil {
 		t.Fatalf("Failed to read binary: %v", err)
@@ -169,7 +169,7 @@ func TestWindowsEmbeddedFrontendAssets(t *testing.T) {
 // TestWindowsFunctionalEndpoints verifies that Windows command-line routines,
 // browser opening mechanisms, systray handlers, and shutdown endpoints are present.
 func TestWindowsFunctionalEndpoints(t *testing.T) {
-	exePath := "../release/forza6-dash-v1.1.1-windows-x64.exe"
+	exePath := "../release/forza6-dash-v1.1.2-windows-x64.exe"
 	raw, err := os.ReadFile(exePath)
 	if err != nil {
 		t.Fatalf("Failed to read binary: %v", err)
@@ -199,7 +199,7 @@ func TestWindowsFunctionalEndpoints(t *testing.T) {
 
 // TestWindowsBinaryReader verifies that standard io operations against the binary succeed.
 func TestWindowsBinaryReader(t *testing.T) {
-	exePath := "../release/forza6-dash-v1.1.1-windows-x64.exe"
+	exePath := "../release/forza6-dash-v1.1.2-windows-x64.exe"
 	f, err := os.Open(exePath)
 	if err != nil {
 		t.Fatalf("Failed to open binary: %v", err)

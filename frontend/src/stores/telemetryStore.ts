@@ -65,6 +65,13 @@ const telemetry = ref<TelemetryPacket>({ ...defaultTelemetryPacket })
 const lastPacketTimestamp = ref<number>(0)
 const isLiveStreamActive = ref<boolean>(false)
 
+// Dynamic Session Distance Tracking (meters)
+// Forza's raw distanceTraveled field in the UDP packet only tracks distance during active races/events
+// and reports 0 in Freeroam/Free Play. We track accumulated distance across the entire live session
+// using high-precision velocity integration with fallback to packet distanceTraveled if greater.
+const sessionDistanceMeters = ref<number>(0)
+let lastPacketTimeMs = 0
+
 let staleTimer: ReturnType<typeof setTimeout> | null = null
 
 const { status, open, close } = useWebSocket('ws://localhost:8080/ws', {
@@ -75,14 +82,33 @@ const { status, open, close } = useWebSocket('ws://localhost:8080/ws', {
   onMessage: (_ws, event) => {
     try {
       const parsed = JSON.parse(event.data) as TelemetryPacket
+      const now = Date.now()
+
+      // Calculate incremental distance via speed (m/s) * dt (seconds)
+      if (lastPacketTimeMs > 0 && parsed.speed > 0.1) {
+        const dt = (now - lastPacketTimeMs) / 1000
+        // Cap dt to 0.5s to prevent massive jumps on reconnections or pauses
+        if (dt > 0 && dt < 0.5) {
+          sessionDistanceMeters.value += parsed.speed * dt
+        }
+      }
+      lastPacketTimeMs = now
+
+      // If the game is broadcasting a valid active race distanceTraveled that exceeds our integrated sum,
+      // sync to the game's official track measurement
+      if (parsed.distanceTraveled && parsed.distanceTraveled > sessionDistanceMeters.value) {
+        sessionDistanceMeters.value = parsed.distanceTraveled
+      }
+
       telemetry.value = parsed
-      lastPacketTimestamp.value = Date.now()
+      lastPacketTimestamp.value = now
       isLiveStreamActive.value = true
 
       if (staleTimer) clearTimeout(staleTimer)
       // If no packet received for 1.5 seconds, set stream active to false
       staleTimer = setTimeout(() => {
         isLiveStreamActive.value = false
+        lastPacketTimeMs = 0
       }, 1500)
     } catch {
       // Discard invalid JSON frames gracefully
@@ -164,6 +190,7 @@ export function useTelemetryStore() {
     status,
     isLiveStreamActive,
     lastPacketTimestamp,
+    sessionDistanceMeters,
     open,
     close,
     speedKmh,

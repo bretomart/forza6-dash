@@ -2,7 +2,7 @@
 import { ref, computed, onUnmounted } from 'vue'
 import { useTelemetryStore } from '../stores/telemetryStore'
 
-const { telemetry, accelPercentage, brakePercentage } = useTelemetryStore()
+const { telemetry, sessionDistanceMeters, accelPercentage, brakePercentage } = useTelemetryStore()
 
 // Real-time rolling history buffer of tire slip and traction for the "Run of Kilometers / Traction Wave"
 const maxHistory = 40
@@ -100,7 +100,7 @@ const rpmBars = computed(() => {
       </div>
       <div class="text-right">
         <div class="text-xs font-mono font-bold text-neutral-300">
-          {{ ((telemetry.distanceTraveled || 0) / 1000).toFixed(1) }} KM
+          {{ ((sessionDistanceMeters || telemetry.distanceTraveled || 0) / 1000).toFixed(2) }} KM
         </div>
         <div class="text-[9px] font-mono text-neutral-500">SESSION DISTANCE</div>
       </div>
