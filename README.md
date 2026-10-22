@@ -8,8 +8,8 @@ Both distributions embed the complete backend relay daemon and the precompiled S
 
 | Platform | Binary Artifact | Target Environment | Size |
 | :--- | :--- | :--- | :--- |
-| **Linux (x86_64)** | `forza6-dash-v1.1.0-linux-x86_64.AppImage` | Universal Linux Distribution | ~4.2 MB |
-| **Windows (x64)** | `forza6-dash-v1.1.0-windows-x64.exe` | Windows 11 / Windows 10 (64-bit) | ~7.3 MB |
+| **Linux (x86_64)** | `forza6-dash-v1.1.1-linux-x86_64.AppImage` | Universal Linux Distribution | ~4.2 MB |
+| **Windows (x64)** | `forza6-dash-v1.1.1-windows-x64.exe` | Windows 11 / Windows 10 (64-bit) | ~7.3 MB |
 
 ### Supported Linux Distributions for AppImage
 The AppImage package is built using Squashfs with an embedded runtime and functions out of the box across modern Linux distributions:
