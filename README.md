@@ -13,13 +13,13 @@ Both distributions embed the complete backend relay daemon and the precompiled S
 
 ### Supported Linux Distributions for AppImage
 The AppImage package is built using Squashfs with an embedded runtime and functions out of the box across modern Linux distributions:
-- **Fedora Workstation** (38, 39, 40, 41+)
-- **Ubuntu Desktop** (20.04 LTS, 22.04 LTS, 24.04 LTS+)
+- **Fedora**
+- **Ubuntu**
 - **Arch Linux / Manjaro**
-- **Debian GNU/Linux** (11 Bullseye, 12 Bookworm, Testing)
-- **openSUSE** (Leap & Tumbleweed)
+- **Debian GNU/Linux**
+- **openSUSE**
 - **Pop!_OS / Linux Mint / Elementary OS**
-- **Red Hat Enterprise Linux / AlmaLinux / Rocky Linux** (8, 9+)
+- **Red Hat Enterprise Linux / AlmaLinux / Rocky Linux**
 
 *(Note: On systems without FUSE installed, pass `--appimage-extract` to extract and run directly).*
 
