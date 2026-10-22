@@ -32,14 +32,14 @@ const shutdownServer = async () => {
           <div>
             <div class="flex items-center space-x-2">
               <h1 class="text-xl md:text-2xl font-black font-mono tracking-tight text-white uppercase">
-                FORZA TELEMETRY CONCEPT HUD
+                FORZA TELEMETRY
               </h1>
               <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-950/80 text-cyan-300 border border-cyan-700/80 font-mono font-bold tracking-widest uppercase">
                 CYBER GT
               </span>
             </div>
             <p class="text-[11px] text-slate-400 font-mono mt-0.5">
-              CAN-BUS REALTIME TELEMETRY · 60 HZ LITTLE-ENDIAN UDP STREAM · METRIC ARCHITECTURE
+              CAN-BUS REALTIME TELEMETRY · 60 HZ LITTLE-ENDIAN UDP STREAM
             </p>
           </div>
         </div>
