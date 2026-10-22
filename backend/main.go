@@ -11,16 +11,24 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"os/exec"
 	"runtime"
 	"sync"
 	"time"
 
+	"github.com/energye/systray"
 	"github.com/gorilla/websocket"
 )
 
 //go:embed web/*
 var embeddedDashboard embed.FS
+
+//go:embed icon.ico
+var iconIcoData []byte
+
+//go:embed icon.png
+var iconPngData []byte
 
 // TelemetryPacket maps the Forza telemetry payload for both Motorsport and Horizon layouts.
 type TelemetryPacket struct {
@@ -461,6 +469,62 @@ func main() {
 			}
 		}()
 	}
+
+	// Initialize system tray icon in background
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Printf("[SYSTRAY] Notice: system tray unavailable in current session: %v", r)
+			}
+		}()
+
+		// On Linux/Unix, if no graphical session / D-Bus is present, skip tray
+		if runtime.GOOS != "windows" {
+			if os.Getenv("DBUS_SESSION_BUS_ADDRESS") == "" && os.Getenv("DISPLAY") == "" && os.Getenv("WAYLAND_DISPLAY") == "" {
+				log.Printf("[SYSTRAY] Graphical desktop session not detected, continuing without system tray")
+				return
+			}
+		}
+
+		onReady := func() {
+			defer func() {
+				if r := recover(); r != nil {
+					log.Printf("[SYSTRAY] Recovery in onReady: %v", r)
+				}
+			}()
+
+			if runtime.GOOS == "windows" {
+				systray.SetIcon(iconIcoData)
+			} else {
+				systray.SetIcon(iconPngData)
+			}
+			systray.SetTitle("Forza 6 Telemetry")
+			systray.SetTooltip("Forza 6 Telemetry Dash & UDP Relay")
+
+			mDashboard := systray.AddMenuItem("Open Dashboard", "Open the HUD in your web browser")
+			mDashboard.Click(func() {
+				targetURL := fmt.Sprintf("http://localhost%s", *httpAddr)
+				_ = openBrowser(targetURL)
+			})
+
+			systray.AddSeparator()
+			mPort := systray.AddMenuItem("Status: Online (Port 2048/8080)", "Listening for telemetry")
+			mPort.Disable()
+			systray.AddSeparator()
+
+			mQuit := systray.AddMenuItem("Quit Forza 6 Dash", "Terminate the relay and dashboard")
+			mQuit.Click(func() {
+				systray.Quit()
+				os.Exit(0)
+			})
+		}
+
+		onExit := func() {
+			os.Exit(0)
+		}
+
+		systray.Run(onReady, onExit)
+	}()
 
 	udpConn, err := net.ListenPacket("udp4", *udpAddr)
 	if err != nil {
